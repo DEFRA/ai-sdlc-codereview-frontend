@@ -38,13 +38,18 @@ describe('#context', () => {
         navigation: [
           {
             isActive: true,
-            text: 'Home',
+            text: 'Generate code review',
             url: '/'
           },
           {
             isActive: false,
-            text: 'About',
-            url: '/about'
+            text: 'View code reviews',
+            url: '/code-reviews'
+          },
+          {
+            isActive: false,
+            text: 'Standards',
+            url: '/standards'
           }
         ],
         serviceName: 'ai-sdlc-codereview-frontend',
@@ -127,13 +132,18 @@ describe('#context cache', () => {
         navigation: [
           {
             isActive: true,
-            text: 'Home',
+            text: 'Generate code review',
             url: '/'
           },
           {
             isActive: false,
-            text: 'About',
-            url: '/about'
+            text: 'View code reviews',
+            url: '/code-reviews'
+          },
+          {
+            isActive: false,
+            text: 'Standards',
+            url: '/standards'
           }
         ],
         serviceName: 'ai-sdlc-codereview-frontend',

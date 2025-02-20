@@ -3,7 +3,13 @@
  */
 export default {
   extends: ['stylelint-config-gds/scss'],
-  ignoreFiles: ['**/public/**', '**/package/**', '**/vendor/**']
+  ignoreFiles: [
+    '**/public/**',
+    '**/package/**',
+    '**/vendor/**',
+    '**/playwright-report/**',
+    '**/test-results/**'
+  ]
 }
 
 /**

@@ -17,7 +17,7 @@
     homepageUrl: "https://www.gov.uk/",
     classes: "app-header",
     containerClasses: "govuk-width-container",
-    serviceName: serviceName,
+    serviceName: "Intelligent Code Reviewer",
     serviceUrl: serviceUrl,
     useTudorCrown: true
   }) }}
@@ -25,7 +25,7 @@
 {% endblock %}
 
 {% block pageTitle %}
-  {{ pageTitle }} | {{ serviceName }}
+  {{ pageTitle }} | {{ "Intelligent Code Reviewer" }}
 {% endblock %}
 
 {% block beforeContent %}
@@ -42,6 +42,10 @@
   {{ govukFooter({
     meta: {
       items: [
+        {
+          href: "https://www.gov.uk/government/organisations/department-for-environment-food-rural-affairs",
+          text: "Department for Environment, Food & Rural Affairs"
+        },
         {
           href: "https://www.gov.uk/help/privacy-notice",
           text: "Privacy"
@@ -60,5 +64,5 @@
 {% endblock %}
 
 {% block bodyEnd %}
-  <script type="module" src="{{ getAssetPath('application.js') }}"></script>
+  <script type="module" src="{{ getAssetPath('javascripts/application.js') }}"></script>
 {% endblock %}

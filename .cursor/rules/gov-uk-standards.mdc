@@ -1,0 +1,132 @@
+---
+description: GOV.UK Frontend
+globs: *.njk, *.js
+---
+# GOV UK Frontend
+
+## Tech Stack
+- Node.js + Hapi.js
+- govuk-frontend npm library
+- Nunjucks templates
+
+## Template Structure
+- Use layouts/page.njk as base template
+- Follow GDS template hierarchy
+- Required template blocks:
+  - pageTitle: Page title with " - Intelligent Code Reviewer" suffix
+  - content: Main content area
+  - beforeContent: For breadcrumbs and navigation
+- Use govuk-width-container for page layout
+- Base template provides app-main-wrapper (custom wrapper that replaces govuk-main-wrapper)
+- Use govuk-grid-row and govuk-grid-column-* for grid layouts
+
+## Layout Patterns
+- Use flexbox for sticky footer layout:
+  ```scss
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .app-main-content {
+    flex: 1 0 auto;
+  }
+  
+  .govuk-footer {
+    margin-top: auto;
+  }
+  ```
+- Width container constraints:
+  ```scss
+  .govuk-width-container {
+    max-width: 960px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  ```
+- Use govuk-spacing() function for consistent spacing
+- Maintain proper padding in app-main-wrapper
+- Follow BEM naming convention with app- prefix for custom components
+
+## Component Usage
+- Use GDS components with data-module="govuk-button" where needed
+- Follow GDS class naming:
+  - Headings: govuk-heading-xl, govuk-heading-l, etc.
+  - Body text: govuk-body
+  - Tables: govuk-table with appropriate child classes
+  - Buttons: govuk-button, govuk-button--warning for variants
+  - Forms: govuk-form-group, govuk-input, etc.
+  - Error handling: govuk-error-message, govuk-error-summary
+
+## Content Guidelines
+- Follow GDS content patterns
+- Use appropriate heading hierarchy
+- Ensure accessible content structure
+- Include proper ARIA roles and attributes
+- Use semantic HTML elements
+
+## Error Handling
+- Use consistent error templates
+- Display user-friendly error messages
+- Include status codes where appropriate
+- Provide clear next steps for users
+
+## Navigation
+- Use buildNavigation helper for consistent nav
+- Implement breadcrumbs where appropriate
+- Clear call-to-action buttons
+- Logical page flow
+
+## Nunjucks Filters
+- Custom filters located in src/config/nunjucks/filters/
+- Each filter should have its own file
+- Common filters:
+  - formatDate
+  - formatCurrency
+  - markdown (for content formatting)
+
+## Accessibility Standards
+- Use appropriate ARIA roles and labels
+- Provide descriptive text for screen readers
+- Ensure keyboard navigation
+- Use semantic HTML elements
+- Follow color contrast guidelines
+- Provide alternative text for images
+- Use proper heading hierarchy
+
+## Empty States
+- Use govuk-inset-text for empty states
+- Provide clear user guidance
+- Include appropriate roles (region, alert)
+- Give clear next steps
+
+## Table Standards
+- Use govuk-table macro consistently
+- Include captions for context
+- Use proper column headers with scope
+- Add data-label for mobile responsiveness
+- Include appropriate ARIA labels
+- Sort indicators where applicable
+
+## Component Patterns
+- Import macros at top of template
+- Group related components
+- Consistent spacing (govuk-!-margin-*)
+- Clear visual hierarchy
+- Proper component nesting
+
+## Content Structure
+- Clear page titles
+- Descriptive headings
+- Bulleted lists for clarity
+- Action-oriented buttons
+- Consistent tone and voice
+- User-focused content
+
+## Mobile Responsiveness
+- Use responsive grid classes
+- Test on all viewports
+- Ensure touch targets
+- Consider mobile-first design
+- Adapt tables for small screens

@@ -1,0 +1,174 @@
+{% extends "layouts/page.njk" %}
+
+{% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+
+{% block pageTitle %}Manage Classifications - Intelligent Code Reviewer{% endblock %}
+
+{% block beforeContent %}
+  {{ govukBreadcrumbs({
+    items: [
+      {
+        text: "Home",
+        href: "/"
+      },
+      {
+        text: "Standards",
+        href: "/standards"
+      },
+      {
+        text: "Classifications"
+      }
+    ]
+  }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">Manage Classifications</h1>
+      
+      <p class="govuk-body">Use classifications to:</p>
+      <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
+        <li>categorize code review standards by technology or domain</li>
+        <li>organize standards into logical groups</li>
+        <li>filter and search standards more effectively</li>
+      </ul>
+    </div>
+  </div>
+
+  {% if errors %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        {{ govukNotificationBanner({
+          titleText: "There is a problem",
+          type: "error",
+          html: '<ul class="govuk-list govuk-list--bullet govuk-error-message">
+            {% for error in errors %}
+              <li>{{ error.message }}</li>
+            {% endfor %}
+          </ul>'
+        }) }}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if classifications and classifications.length > 0 %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        {% set tableRows = [] %}
+        {% for classification in classifications %}
+          {% set tableRows = (tableRows.push([
+            {
+              text: classification.name,
+              attributes: {
+                "data-label": "Name"
+              }
+            },
+            {
+              html: '<time datetime="' + classification.created_at | formatDate("yyyy-MM-dd HH:mm") + '">' + classification.created_at | formatDate("d MMMM yyyy 'at' HH:mm") + '</time>',
+              attributes: {
+                "data-label": "Creation date"
+              }
+            },
+            {
+              html: '<form method="POST" action="/standards/classifications/' + classification._id + '/delete" class="app-delete-classification">
+                ' + govukButton({
+                  text: "Delete",
+                  classes: "govuk-button--warning govuk-!-margin-0",
+                  attributes: {
+                    "data-module": "govuk-button",
+                    "data-prevent-double-click": "true",
+                    "aria-label": "Delete " + classification.name + " classification"
+                  }
+                }) + '
+              </form>',
+              attributes: {
+                "data-label": "Actions"
+              }
+            }
+          ]), tableRows) %}
+        {% endfor %}
+
+        {{ govukTable({
+          caption: "Current Classifications",
+          captionClasses: "govuk-table__caption--m govuk-!-margin-top-4",
+          firstCellIsHeader: false,
+          attributes: {
+            "aria-label": "Classifications list",
+            "data-module": "govuk-table"
+          },
+          classes: "app-classifications-table govuk-!-margin-bottom-6",
+          head: [
+            {
+              text: "Name",
+              attributes: {
+                "aria-sort": "none",
+                scope: "col"
+              },
+              classes: "govuk-!-width-one-third"
+            },
+            {
+              text: "Creation date",
+              attributes: {
+                "aria-sort": "none",
+                scope: "col"
+              },
+              classes: "govuk-!-width-one-third"
+            },
+            {
+              text: "Actions",
+              attributes: {
+                "aria-sort": "none",
+                scope: "col"
+              },
+              classes: "govuk-!-width-one-third"
+            }
+          ],
+          rows: tableRows
+        }) }}
+      </div>
+    </div>
+  {% else %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-inset-text" role="region" aria-label="No classifications found">
+          <h2 class="govuk-heading-m">No classifications found</h2>
+          <p class="govuk-body">Add your first classification using the form below.</p>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="govuk-grid-row govuk-!-margin-top-6">
+    <div class="govuk-grid-column-two-thirds">
+      <form method="POST" action="/standards/classifications" novalidate>
+        <div class="govuk-form-group govuk-!-margin-bottom-6">
+          {{ govukInput({
+            label: {
+              text: "Add new classification",
+              classes: "govuk-label--m",
+              isPageHeading: false
+            },
+            hint: {
+              text: "Enter a unique name for the classification. You can use letters, numbers, spaces, dots, hyphens and hash symbols."
+            },
+            id: "name",
+            name: "name",
+            value: data.name if data.name,
+            errorMessage: errors.name if errors and errors.name
+          }) }}
+        </div>
+
+        {{ govukButton({
+          text: "Add classification",
+          preventDoubleClick: true,
+          classes: "govuk-button--primary"
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}

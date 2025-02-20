@@ -1,4 +1,4 @@
-import { homeController } from '~/src/server/home/controller.js'
+import { getHome, postHome } from '~/src/server/home/controller.js'
 
 /**
  * Sets up the routes used in the home page.
@@ -16,7 +16,22 @@ export const home = {
         {
           method: 'GET',
           path: '/',
-          ...homeController
+          handler: getHome,
+          options: {
+            auth: false,
+            description: 'Home page',
+            tags: ['api', 'home']
+          }
+        },
+        {
+          method: 'POST',
+          path: '/',
+          handler: postHome,
+          options: {
+            auth: false,
+            description: 'Create code review',
+            tags: ['api', 'home']
+          }
         }
       ])
     }

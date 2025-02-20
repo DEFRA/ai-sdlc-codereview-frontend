@@ -1,0 +1,113 @@
+{% extends "layouts/page.njk" %}
+
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+{% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
+
+{% block pageTitle %}Standards Management - Intelligent Code Reviewer{% endblock %}
+
+{% block beforeContent %}
+  {{ govukBreadcrumbs({
+    items: [
+      {
+        text: "Home",
+        href: "/"
+      },
+      {
+        text: "Standards"
+      }
+    ]
+  }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">Standards Management</h1>
+      
+      <p class="govuk-body">Use this service to:</p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>manage standards sets and the standards within them</li>
+        <li>manage classifications of standards</li>
+        <li>define rules for automated code reviews</li>
+      </ul>
+
+      {{ govukInsetText({
+        text: "Standards and classifications are used to ensure consistent code quality across all Defra services."
+      }) }}
+
+      {{ govukSummaryList({
+        rows: [
+          {
+            key: {
+              text: "Classifications"
+            },
+            value: {
+              html: govukTag({
+                text: "5 active",
+                classes: "govuk-tag--blue"
+              })
+            },
+            actions: {
+              classes: "govuk-!-width-one-quarter",
+              items: [
+                {
+                  href: "/standards/classifications",
+                  text: "Manage",
+                  visuallyHiddenText: "classifications"
+                }
+              ]
+            }
+          },
+          {
+            key: {
+              text: "Standard Sets"
+            },
+            value: {
+              html: govukTag({
+                text: "2 active",
+                classes: "govuk-tag--blue"
+              })
+            },
+            actions: {
+              classes: "govuk-!-width-one-quarter",
+              items: [
+                {
+                  href: "/standards/standard-sets",
+                  text: "Manage",
+                  visuallyHiddenText: "standards"
+                }
+              ]
+            }
+          }
+        ]
+      }) }}
+    </div>
+
+    <div class="govuk-grid-column-one-third">
+      <aside class="govuk-related-navigation" role="complementary">
+        <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Related links</h2>
+        <nav role="navigation" aria-labelledby="related-nav-heading">
+          <ul class="govuk-related-navigation__list govuk-!-padding-left-3">
+            <li class="govuk-related-navigation__item govuk-!-margin-bottom-1">
+              <a class="govuk-link" href="#">
+                Defra development standards
+              </a>
+            </li>
+            <li class="govuk-related-navigation__item govuk-!-margin-bottom-1">
+              <a class="govuk-link" href="#">
+                Code review guidelines
+              </a>
+            </li>
+            <li class="govuk-related-navigation__item">
+              <a class="govuk-link" href="#">
+                Technology standards
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+    </div>
+  </div>
+{% endblock %}

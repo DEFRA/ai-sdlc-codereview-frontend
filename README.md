@@ -4,10 +4,13 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_ai-sdlc-codereview-frontend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=DEFRA_ai-sdlc-codereview-frontend)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_ai-sdlc-codereview-frontend&metric=coverage)](https://sonarcloud.io/summary/new_code?id=DEFRA_ai-sdlc-codereview-frontend)
 
-Core delivery platform Node.js Frontend Template.
+A web application for submitting code repositories for AI-powered code review. This frontend service provides an interface for submitting repositories and reviewing the generated code analysis reports.
+
+## Contents
 
 - [Requirements](#requirements)
   - [Node.js](#nodejs)
+- [Data Models](#data-models)
 - [Server-side Caching](#server-side-caching)
 - [Redis](#redis)
 - [Local Development](#local-development)
@@ -41,6 +44,43 @@ cd ai-sdlc-codereview-frontend
 nvm use
 ```
 
+## Data Models
+
+The application uses the following core data models:
+
+### Repository Review
+
+```javascript
+{
+  id: string,              // Unique identifier
+  repositoryUrl: string,   // Git repository URL
+  branch: string,          // Git branch name
+  status: string,          // Review status (pending/in-progress/completed)
+  createdAt: Date,         // Creation timestamp
+  updatedAt: Date,         // Last update timestamp
+  results: {               // Review results
+    suggestions: Array,    // Code improvement suggestions
+    issues: Array,         // Identified issues
+    metrics: Object        // Code quality metrics
+  }
+}
+```
+
+### Review Comment
+
+```javascript
+{
+  id: string,              // Unique identifier
+  reviewId: string,        // Reference to Repository Review
+  filePath: string,        // Path to the file
+  lineNumber: number,      // Line number in file
+  content: string,         // Comment content
+  type: string,            // Comment type (suggestion/issue)
+  severity: string,        // Severity level
+  createdAt: Date         // Creation timestamp
+}
+```
+
 ## Server-side Caching
 
 We use Catbox for server-side caching. By default the service will use CatboxRedis when deployed and CatboxMemory for
@@ -53,9 +93,7 @@ instance of the service and it will not persist between restarts.
 
 ## Redis
 
-Redis is an in-memory key-value store. Every instance of a service has access to the same Redis key-value store similar
-to how services might have a database (or MongoDB). All frontend services are given access to a namespaced prefixed that
-matches the service name. e.g. `my-service` will have access to everything in Redis that is prefixed with `my-service`.
+Redis is used for storing session data and caching code review results. Every instance of the service has access to the same Redis key-value store. All frontend services are given access to a namespaced prefix that matches the service name. e.g. `ai-sdlc-codereview-frontend` will have access to everything in Redis that is prefixed with `ai-sdlc-codereview-frontend`.
 
 If your service does not require a session cache to be shared between instances or if you don't require Redis, you can
 disable setting `SESSION_CACHE_ENGINE=false` or changing the default value in `~/src/config/index.js`.

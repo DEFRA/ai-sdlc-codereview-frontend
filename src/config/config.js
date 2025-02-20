@@ -31,6 +31,12 @@ export const config = convict({
     default: 3000,
     env: 'PORT'
   },
+  apiBaseUrl: {
+    doc: 'Base URL for the code review API',
+    format: String,
+    default: 'http://localhost:8085',
+    env: 'API_BASE_URL'
+  },
   staticCacheTimeout: {
     doc: 'Static cache timeout in milliseconds',
     format: Number,
@@ -100,7 +106,14 @@ export const config = convict({
     format: String,
     nullable: true,
     default: null,
-    env: 'HTTP_PROXY'
+    env: 'CDP_HTTP_PROXY'
+  }),
+  httpsProxy: /** @type {SchemaObj<string | null>} */ ({
+    doc: 'HTTPS Proxy',
+    format: String,
+    nullable: true,
+    default: null,
+    env: 'CDP_HTTPS_PROXY'
   }),
   isSecureContextEnabled: {
     doc: 'Enable Secure Context',

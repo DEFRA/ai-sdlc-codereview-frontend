@@ -1,0 +1,91 @@
+{% extends "layouts/page.njk" %}
+
+{% from "govuk/components/tabs/macro.njk" import govukTabs %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+
+{% block content %}
+  <h1 class="govuk-heading-l">Code Review Details</h1>
+
+  {% if review %}
+    {{ govukSummaryList({
+      role: "contentinfo",
+      ariaLabel: "Code review information",
+      rows: [
+        {
+          key: {
+            text: "Code Repository",
+            classes: "govuk-!-width-one-third"
+          },
+          value: {
+            html: '<a href="' + review.repository_url + '" class="govuk-link" target="_blank" rel="noopener noreferrer">' + review.repository_url + ' (opens in new tab)</a>',
+            classes: "govuk-!-width-two-thirds"
+          }
+        },
+        {
+          key: {
+            text: "Created",
+            classes: "govuk-!-width-one-third"
+          },
+          value: {
+            text: review.created_at,
+            classes: "govuk-!-width-two-thirds"
+          }
+        },
+        {
+          key: {
+            text: "Updated",
+            classes: "govuk-!-width-one-third"
+          },
+          value: {
+            text: review.updated_at,
+            classes: "govuk-!-width-two-thirds"
+          }
+        },
+        {
+          key: {
+            text: "Status",
+            classes: "govuk-!-width-one-third"
+          },
+          value: {
+            html: govukTag({
+              text: review.status | replace("_", " ") | title,
+              classes: "govuk-tag--" + (review.status | lower == "failed" and "red" or (review.status | lower == "completed" and "green" or "blue")),
+              attributes: {
+                "role": "status",
+                "aria-label": "Review status: " + (review.status | replace("_", " ") | title),
+                "data-review-id": review._id
+              }
+            })
+          }
+        }
+      ]
+    }) }}
+
+    {% if review.compliance_reports and review.compliance_reports | length > 0 %}
+      {% set tabItems = [] %}
+      {% for report in review.compliance_reports %}
+        {% set _ = tabItems.push({
+          label: report.standard_set_name,
+          id: "compliance-report-" + loop.index,
+          panel: {
+            html: '<div class="govuk-body">' + report.report | safe + '</div>'
+          }
+        }) %}
+      {% endfor %}
+
+      {{ govukTabs({
+        idPrefix: "compliance-reports",
+        items: tabItems
+      }) }}
+    {% else %}
+      <p class="govuk-body">No compliance reports available yet.</p>
+    {% endif %}
+  {% else %}
+    <p class="govuk-body" role="alert">Code review not found.</p>
+  {% endif %}
+
+  <p class="govuk-body">
+    <a href="/code-reviews" class="govuk-link" aria-label="Return to code reviews list">Back to code reviews</a>
+  </p>
+{% endblock %}
