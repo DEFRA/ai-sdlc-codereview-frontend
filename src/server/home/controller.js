@@ -19,9 +19,12 @@ function isValidUrl(url) {
 export async function getHome(_request, h) {
   let standardSets = []
   try {
-    const response = await fetch(
-      `${config.get('apiBaseUrl')}/api/v1/standard-sets`
-    )
+    const apiBaseUrl = config.get('apiBaseUrl')
+    const apiEndpoint = `${apiBaseUrl}/api/v1/standard-sets`
+
+    _request.logger.info(`Fetching standard sets from: ${apiEndpoint}`)
+
+    const response = await fetch(apiEndpoint)
 
     if (!response.ok) {
       throw new Error(`API returned ${response.status}`)
@@ -29,7 +32,15 @@ export async function getHome(_request, h) {
 
     standardSets = await response.json()
   } catch (err) {
-    _request.logger.error('Error fetching standard sets:', err)
+    const apiBaseUrl = config.get('apiBaseUrl')
+    _request.logger.error({
+      msg: 'Error fetching standard sets for home page',
+      error: err.message,
+      stack: err.stack,
+      apiBaseUrl,
+      endpoint: '/api/v1/standard-sets',
+      fullUrl: `${apiBaseUrl}/api/v1/standard-sets`
+    })
   }
 
   return h.view('home/index', {
@@ -97,19 +108,24 @@ export async function postHome(request, h) {
   }
 
   try {
-    const response = await fetch(
-      `${config.get('apiBaseUrl')}/api/v1/code-reviews`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          repository_url: repositoryUrl,
-          standard_sets: standardSets
-        })
-      }
-    )
+    const apiBaseUrl = config.get('apiBaseUrl')
+    const apiEndpoint = `${apiBaseUrl}/api/v1/code-reviews`
+
+    request.logger.info(`Creating code review at: ${apiEndpoint}`, {
+      repositoryUrl,
+      standardSetsCount: standardSets.length
+    })
+
+    const response = await fetch(apiEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        repository_url: repositoryUrl,
+        standard_sets: standardSets
+      })
+    })
 
     if (!response.ok) {
       throw new Error(`API returned ${response.status}`)
@@ -118,7 +134,17 @@ export async function postHome(request, h) {
     const review = await response.json()
     return h.redirect(`/code-reviews/${review._id}`)
   } catch (err) {
-    request.logger.error('Error creating code review:', err)
+    const apiBaseUrl = config.get('apiBaseUrl')
+    request.logger.error({
+      msg: 'Error creating code review',
+      error: err.message,
+      stack: err.stack,
+      apiBaseUrl,
+      endpoint: '/api/v1/code-reviews',
+      fullUrl: `${apiBaseUrl}/api/v1/code-reviews`,
+      repositoryUrl,
+      standardSetsCount: standardSets.length
+    })
     return h.view('home/index', {
       pageTitle: 'Home',
       heading: 'Generate Code Review',

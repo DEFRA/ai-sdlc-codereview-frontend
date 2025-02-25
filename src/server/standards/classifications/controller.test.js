@@ -16,6 +16,7 @@ describe('Classifications Controller', () => {
   beforeEach(() => {
     mockRequest = {
       logger: {
+        info: jest.fn(),
         error: jest.fn()
       },
       params: {
@@ -52,9 +53,13 @@ describe('Classifications Controller', () => {
 
       await getClassifications(mockRequest, mockH)
 
-      expect(fetchSpy).toHaveBeenCalledWith(
-        `${config.get('apiBaseUrl')}/api/v1/classifications`
+      const apiBaseUrl = config.get('apiBaseUrl')
+      const apiEndpoint = `${apiBaseUrl}/api/v1/classifications`
+
+      expect(mockRequest.logger.info).toHaveBeenCalledWith(
+        `Fetching classifications from: ${apiEndpoint}`
       )
+      expect(fetchSpy).toHaveBeenCalledWith(apiEndpoint)
       expect(mockH.view).toHaveBeenCalledWith(
         'standards/classifications/index',
         {
@@ -105,16 +110,19 @@ describe('Classifications Controller', () => {
 
       await createClassification(mockRequest, mockH)
 
-      expect(fetchSpy).toHaveBeenCalledWith(
-        `${config.get('apiBaseUrl')}/api/v1/classifications`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ name: 'Test Classification' })
-        }
+      const apiBaseUrl = config.get('apiBaseUrl')
+      const apiEndpoint = `${apiBaseUrl}/api/v1/classifications`
+
+      expect(mockRequest.logger.info).toHaveBeenCalledWith(
+        `Creating classification at: ${apiEndpoint}`
       )
+      expect(fetchSpy).toHaveBeenCalledWith(apiEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name: 'Test Classification' })
+      })
       expect(mockH.redirect).toHaveBeenCalledWith('/standards/classifications')
     })
 
@@ -189,12 +197,15 @@ describe('Classifications Controller', () => {
 
       await deleteClassification(mockRequest, mockH)
 
-      expect(fetchSpy).toHaveBeenCalledWith(
-        `${config.get('apiBaseUrl')}/api/v1/classifications/${mockRequest.params.id}`,
-        {
-          method: 'DELETE'
-        }
+      const apiBaseUrl = config.get('apiBaseUrl')
+      const apiEndpoint = `${apiBaseUrl}/api/v1/classifications/${mockRequest.params.id}`
+
+      expect(mockRequest.logger.info).toHaveBeenCalledWith(
+        `Deleting classification at: ${apiEndpoint}`
       )
+      expect(fetchSpy).toHaveBeenCalledWith(apiEndpoint, {
+        method: 'DELETE'
+      })
       expect(mockH.redirect).toHaveBeenCalledWith('/standards/classifications')
     })
 

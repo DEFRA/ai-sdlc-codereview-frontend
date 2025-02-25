@@ -38,9 +38,13 @@ describe('Standard Sets Controller', () => {
 
       await getStandardSets(request, h)
 
-      expect(global.fetch).toHaveBeenCalledWith(
-        'http://test-api/api/v1/standard-sets'
+      const apiBaseUrl = 'http://test-api'
+      const apiEndpoint = `${apiBaseUrl}/api/v1/standard-sets`
+
+      expect(request.logger.info).toHaveBeenCalledWith(
+        `Fetching standard sets from: ${apiEndpoint}`
       )
+      expect(global.fetch).toHaveBeenCalledWith(apiEndpoint)
       expect(h.view).toHaveBeenCalledWith('standards/standard-sets/index', {
         pageTitle: 'Manage Standard Sets',
         standardSets,
@@ -90,21 +94,25 @@ describe('Standard Sets Controller', () => {
 
       await createStandardSet({ ...request, payload: validPayload }, h)
 
-      expect(global.fetch).toHaveBeenCalledWith(
-        'http://test-api/api/v1/standard-sets',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json'
-          },
-          body: JSON.stringify({
-            name: validPayload.name,
-            repository_url: validPayload.repository_url,
-            custom_prompt: validPayload.custom_prompt
-          })
-        }
+      const apiBaseUrl = 'http://test-api'
+      const apiEndpoint = `${apiBaseUrl}/api/v1/standard-sets`
+
+      expect(request.logger.info).toHaveBeenCalledWith(
+        `Creating standard set at: ${apiEndpoint}`,
+        { data: expect.any(Object) }
       )
+      expect(global.fetch).toHaveBeenCalledWith(apiEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify({
+          name: validPayload.name,
+          repository_url: validPayload.repository_url,
+          custom_prompt: validPayload.custom_prompt
+        })
+      })
       expect(h.redirect).toHaveBeenCalledWith('/standards/standard-sets')
     })
 
@@ -176,12 +184,15 @@ describe('Standard Sets Controller', () => {
 
       await deleteStandardSet({ ...request, params: { id: '123' } }, h)
 
-      expect(global.fetch).toHaveBeenCalledWith(
-        'http://test-api/api/v1/standard-sets/123',
-        {
-          method: 'DELETE'
-        }
+      const apiBaseUrl = 'http://test-api'
+      const apiEndpoint = `${apiBaseUrl}/api/v1/standard-sets/123`
+
+      expect(request.logger.info).toHaveBeenCalledWith(
+        `Deleting standard set at: ${apiEndpoint}`
       )
+      expect(global.fetch).toHaveBeenCalledWith(apiEndpoint, {
+        method: 'DELETE'
+      })
       expect(h.redirect).toHaveBeenCalledWith('/standards/standard-sets')
     })
 

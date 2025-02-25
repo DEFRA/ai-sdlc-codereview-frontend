@@ -15,9 +15,12 @@ import { buildNavigation } from '~/src/config/nunjucks/context/build-navigation.
  */
 export async function getClassifications(request, h) {
   try {
-    const response = await fetch(
-      `${config.get('apiBaseUrl')}/api/v1/classifications`
-    )
+    const apiBaseUrl = config.get('apiBaseUrl')
+    const apiEndpoint = `${apiBaseUrl}/api/v1/classifications`
+
+    request.logger.info(`Fetching classifications from: ${apiEndpoint}`)
+
+    const response = await fetch(apiEndpoint)
 
     if (!response.ok) {
       throw new Error(`API responded with status: ${response.status}`)
@@ -31,7 +34,15 @@ export async function getClassifications(request, h) {
       navigation: buildNavigation(request)
     })
   } catch (err) {
-    request.logger.error('Error fetching classifications:', err)
+    const apiBaseUrl = config.get('apiBaseUrl')
+    request.logger.error({
+      msg: 'Error fetching classifications',
+      error: err.message,
+      stack: err.stack,
+      apiBaseUrl,
+      endpoint: '/api/v1/classifications',
+      fullUrl: `${apiBaseUrl}/api/v1/classifications`
+    })
     return h.view('error/index', {
       statusCode: 500,
       title: 'Internal Server Error',
@@ -76,16 +87,18 @@ export async function createClassification(request, h) {
   }
 
   try {
-    const response = await fetch(
-      `${config.get('apiBaseUrl')}/api/v1/classifications`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      }
-    )
+    const apiBaseUrl = config.get('apiBaseUrl')
+    const apiEndpoint = `${apiBaseUrl}/api/v1/classifications`
+
+    request.logger.info(`Creating classification at: ${apiEndpoint}`)
+
+    const response = await fetch(apiEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
 
     if (!response.ok) {
       throw new Error(`API responded with status: ${response.status}`)
@@ -93,7 +106,16 @@ export async function createClassification(request, h) {
 
     return h.redirect('/standards/classifications')
   } catch (err) {
-    request.logger.error('Error creating classification:', err)
+    const apiBaseUrl = config.get('apiBaseUrl')
+    request.logger.error({
+      msg: 'Error creating classification',
+      error: err.message,
+      stack: err.stack,
+      apiBaseUrl,
+      endpoint: '/api/v1/classifications',
+      fullUrl: `${apiBaseUrl}/api/v1/classifications`,
+      data
+    })
     return h.view('error/index', {
       statusCode: 500,
       title: 'Internal Server Error',
@@ -110,12 +132,14 @@ export async function createClassification(request, h) {
  */
 export async function deleteClassification(request, h) {
   try {
-    const response = await fetch(
-      `${config.get('apiBaseUrl')}/api/v1/classifications/${request.params.id}`,
-      {
-        method: 'DELETE'
-      }
-    )
+    const apiBaseUrl = config.get('apiBaseUrl')
+    const apiEndpoint = `${apiBaseUrl}/api/v1/classifications/${request.params.id}`
+
+    request.logger.info(`Deleting classification at: ${apiEndpoint}`)
+
+    const response = await fetch(apiEndpoint, {
+      method: 'DELETE'
+    })
 
     if (!response.ok) {
       throw new Error(`API responded with status: ${response.status}`)
@@ -123,7 +147,16 @@ export async function deleteClassification(request, h) {
 
     return h.redirect('/standards/classifications')
   } catch (err) {
-    request.logger.error('Error deleting classification:', err)
+    const apiBaseUrl = config.get('apiBaseUrl')
+    request.logger.error({
+      msg: 'Error deleting classification',
+      error: err.message,
+      stack: err.stack,
+      apiBaseUrl,
+      endpoint: `/api/v1/classifications/${request.params.id}`,
+      fullUrl: `${apiBaseUrl}/api/v1/classifications/${request.params.id}`,
+      classificationId: request.params.id
+    })
     return h.view('error/index', {
       statusCode: 500,
       title: 'Internal Server Error',
