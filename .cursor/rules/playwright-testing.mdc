@@ -1,6 +1,7 @@
 ---
 description: Playwright Testing
-globs: tests/*.js
+globs: 
+alwaysApply: false
 ---
 # Playwright Testing Rules
 

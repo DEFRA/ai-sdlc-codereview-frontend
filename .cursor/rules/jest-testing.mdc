@@ -1,6 +1,7 @@
 ---
 description: Jest Testing
-globs: *.test.js
+globs: 
+alwaysApply: false
 ---
 # Jest Testing Rules
 

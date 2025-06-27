@@ -1,6 +1,7 @@
 ---
 description: GOV.UK Frontend
-globs: *.njk, *.js
+globs: 
+alwaysApply: false
 ---
 # GOV UK Frontend
 
