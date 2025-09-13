@@ -34,7 +34,7 @@ feature-name/
 └── *.njk             # Nunjucks templates
 ```
 
-**Controller Example**: See `.github/copilot-instructions/controllers.md` for detailed patterns.
+**Controller Example**: See `.github/copilot-instructions/controllers.instructions.md` for detailed patterns.
 
 ### Configuration (`src/config/`)
 - Use `convict` for all configuration management
@@ -42,26 +42,26 @@ feature-name/
 - Environment-aware defaults (production vs development)
 
 ### Client-Side (`src/client/`)
-- **JavaScript**: See `.github/copilot-instructions/client.md`
+- **JavaScript**: See `.github/copilot-instructions/client.instructions.md`
 - **Stylesheets**: SCSS with BEM naming, `app-` prefix for custom components
 - **Import Pattern**: Use `~` alias for absolute imports
 
 ## GOV.UK Frontend Conventions
 
 Template patterns are handled by path-specific custom instructions:
-- **Nunjucks templates** (`*.njk`): See `.github/copilot-instructions/templates.md`
+- **Nunjucks templates** (`*.njk`): See `.github/copilot-instructions/templates.instructions.md`
 
 ## API Integration Patterns
 
 API integration is handled by path-specific custom instructions:
-- **Controller patterns**: See `.github/copilot-instructions/controllers.md`
-- **Client-side fetch**: See `.github/copilot-instructions/client.md`
+- **Controller patterns**: See `.github/copilot-instructions/controllers.instructions.md`
+- **Client-side fetch**: See `.github/copilot-instructions/client.instructions.md`
 
 ## Testing
 
 Testing is handled by path-specific custom instructions:
-- **Jest unit tests** (`*.test.js`): See `.github/copilot-instructions/jest.md`
-- **Playwright E2E tests** (`tests/`): See `.github/copilot-instructions/tests.md`
+- **Jest unit tests** (`*.test.js`): See `.github/copilot-instructions/jest.instructions.md`
+- **Playwright E2E tests** (`tests/`): See `.github/copilot-instructions/tests.instructions.md`
 
 Key commands:
 ```bash
@@ -95,9 +95,9 @@ npm run test:e2e          # Playwright end-to-end tests
 
 File creation follows path-specific patterns:
 - **New Features**: Follow `src/server/feature-name/` pattern
-- **Templates** (`*.njk`): See `.github/copilot-instructions/templates.md`
-- **Controllers** (`controller.js`): See `.github/copilot-instructions/controllers.md`
-- **Client-side** (`src/client/`): See `.github/copilot-instructions/client.md`
+- **Templates** (`*.njk`): See `.github/copilot-instructions/templates.instructions.md`
+- **Controllers** (`controller.js`): See `.github/copilot-instructions/controllers.instructions.md`
+- **Client-side** (`src/client/`): See `.github/copilot-instructions/client.instructions.md`
 - **Tests**: Co-locate with source files, use descriptive test names
 - **Styles**: Add to `src/client/stylesheets/components/` with BEM naming
 
@@ -105,4 +105,4 @@ File creation follows path-specific patterns:
 
 When reviewing code, include:
 - Avoiding redundant code and ensuring DRY principles. IMPORTANT: Check vs existing code to avoid duplication.
-- Apply the security best practices outlined in `.github/copilot-instructions/security-review.md`.
+- Apply the security best practices outlined in `.github/copilot-instructions/security-review.instructions.md`.
