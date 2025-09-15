@@ -2,9 +2,9 @@
 applyTo: '**/controller.js'
 ---
 
-# Hapi.js Controller Instructions
+# Backend Patterns - Controllers & API Integration
 
-This file provides specific guidance for working with Hapi.js controller files (`**/controller.js`) in this DEFRA application.
+This file provides comprehensive guidance for Hapi.js controllers and API integration patterns.
 
 ## Project Context
 
@@ -129,21 +129,11 @@ export async function getCodeReviewById(request, h) {
       })
     }
 
-    if (response.status === 403) {
-      return h.view('error/index', {
-        pageTitle: 'Forbidden',
-        heading: 'You do not have permission to view this code review',
-        message:
-          'Please contact your administrator if you believe this is incorrect.'
-      })
-    }
-
     if (!response.ok) {
       throw new Error(`API returned ${response.status}`)
     }
 
     const review = await response.json()
-
     return h.view('code-reviews/detail', {
       pageTitle: 'Code Review Details',
       review: formatReviewData(review)
@@ -159,15 +149,6 @@ export async function getCodeReviewById(request, h) {
     })
   }
 }
-```
-
-### Error Logging Standards
-
-```javascript
-// Always log errors with descriptive context
-request.logger.error('Error fetching code reviews:', err)
-request.logger.error('Error creating code review:', err)
-request.logger.error('Error updating code review status:', err)
 ```
 
 ## Response Patterns
@@ -207,16 +188,6 @@ export async function getCodeReviewStatus(request, h) {
     return h.response({ error: 'Internal server error' }).code(500)
   }
 }
-```
-
-### Redirects
-
-```javascript
-// For successful form submissions
-return h.redirect('/code-reviews')
-
-// With status code
-return h.redirect('/code-reviews').code(302)
 ```
 
 ## Data Formatting Functions
@@ -274,10 +245,6 @@ function formatCodeReviewsForTable(codeReviews) {
       attributes: { 'data-label': 'Created' }
     },
     {
-      html: `<time datetime="${review.updated_at}">${formatDate(review.updated_at)}</time>`,
-      attributes: { 'data-label': 'Updated' }
-    },
-    {
       html: `<strong class="govuk-tag ${getStatusTagClass(review.status)}" role="status" data-review-id="${review._id}" aria-label="Review status: ${formatStatusText(review.status)}">${formatStatusText(review.status)}</strong>`,
       attributes: { 'data-label': 'Status' }
     }
@@ -288,24 +255,6 @@ function getStatusTagClass(status) {
   if (status === 'failed') return 'govuk-tag--red'
   if (status === 'completed') return 'govuk-tag--green'
   return '' // Default blue
-}
-
-function formatStatusText(status) {
-  return status.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
-}
-```
-
-### Markdown Processing
-
-```javascript
-import { markdown } from '~/src/config/nunjucks/filters/markdown.js'
-
-// Format compliance reports with markdown
-if (review.compliance_reports && review.compliance_reports.length > 0) {
-  review.compliance_reports = review.compliance_reports.map((report) => ({
-    ...report,
-    report: markdown(report.report)
-  }))
 }
 ```
 
@@ -383,16 +332,6 @@ export async function getFeatureById(request, h) {
 export async function getFeatures(request, h) {
   const { status, page = 1 } = request.query
   // Use query parameters...
-}
-```
-
-### Request Payload
-
-```javascript
-export async function updateFeature(request, h) {
-  const { id } = request.params
-  const updateData = request.payload
-  // Use payload...
 }
 ```
 

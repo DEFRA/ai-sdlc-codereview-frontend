@@ -1,21 +1,21 @@
 ---
-applyTo: '**/*.test.js'
+applyTo: '**/*.test.js,tests/**/*'
 ---
 
-# Jest Unit Testing Instructions
+# Testing Patterns - Jest & Playwright
 
-This file provides specific guidance for working with Jest unit tests (files matching `*.test.js` pattern).
+This file provides comprehensive guidance for Jest unit tests and Playwright end-to-end testing.
 
 ## Project Context
 
-This is a **Hapi.js server-side application** where Jest tests focus on:
+This is a **Hapi.js server-side application** testing:
 
 - **Controller functions** with `(request, h)` signatures
 - **API integration** mocking with `fetch`
-- **Error handling** and logging patterns
-- **Data transformation** and formatting logic
+- **GOV.UK Frontend** components with role-based selectors
+- **Real user journeys** from form submission to result display
 
-## Test Structure Patterns
+## Jest Unit Testing Patterns
 
 ### Standard Test Setup
 
@@ -58,9 +58,7 @@ const mockReview = {
 }
 ```
 
-## API Integration Testing
-
-### Fetch Mocking Pattern
+### API Integration Testing
 
 ```javascript
 describe('API calls', () => {
@@ -95,8 +93,6 @@ describe('API calls', () => {
 
 ### HTTP Status Code Testing
 
-Test all specific status codes your controllers handle:
-
 ```javascript
 it('should handle 404 errors', async () => {
   fetchSpy.mockResolvedValueOnce({
@@ -119,8 +115,6 @@ it('should handle 404 errors', async () => {
   })
 })
 ```
-
-## Controller Testing Patterns
 
 ### View Rendering Tests
 
@@ -147,25 +141,7 @@ it('should render template with correct data', async () => {
 })
 ```
 
-### Error Logging Tests
-
-```javascript
-it('should log errors with context', async () => {
-  const error = new Error('Test error')
-  fetchSpy.mockRejectedValueOnce(error)
-
-  await controllerFunction(mockRequest, mockH)
-
-  expect(mockRequest.logger.error).toHaveBeenCalledWith(
-    expect.stringContaining('Error description'),
-    error
-  )
-})
-```
-
-## Data Transformation Testing
-
-### Date Formatting Tests
+### Data Transformation Testing
 
 ```javascript
 describe('formatDate', () => {
@@ -188,55 +164,6 @@ describe('formatDate', () => {
         created_at: '14 January 2024 at 12:00pm'
       })
     })
-  })
-
-  it('should handle midnight (12am)', async () => {
-    const midnightReview = {
-      ...mockReview,
-      created_at: '2024-01-14T00:00:00Z'
-    }
-
-    fetchSpy.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(midnightReview)
-    })
-
-    await getCodeReviewById(mockRequest, mockH)
-
-    expect(mockH.view).toHaveBeenCalledWith('code-reviews/detail', {
-      pageTitle: 'Code Review Details',
-      review: expect.objectContaining({
-        created_at: '14 January 2024 at 12:00am'
-      })
-    })
-  })
-})
-```
-
-### GOV.UK Table Data Formatting
-
-```javascript
-it('should format table data correctly for govukTable macro', async () => {
-  await getCodeReviews(mockRequest, mockH)
-
-  expect(mockH.view).toHaveBeenCalledWith('code-reviews/index', {
-    pageTitle: 'Code Reviews',
-    tableRows: [
-      [
-        {
-          html: expect.stringContaining('<a href="/code-reviews/'),
-          attributes: { 'data-label': 'Code Repository' }
-        },
-        {
-          html: expect.stringContaining('<time datetime="'),
-          attributes: { 'data-label': 'Created' }
-        },
-        {
-          html: expect.stringContaining('govuk-tag'),
-          attributes: { 'data-label': 'Status' }
-        }
-      ]
-    ]
   })
 })
 ```
@@ -265,61 +192,127 @@ it('should apply correct status tag colors', async () => {
 })
 ```
 
-## API Response Testing
+## Playwright End-to-End Testing
 
-### JSON API Tests
+### Test Structure and Organization
 
 ```javascript
-it('should return JSON response for API endpoints', async () => {
-  fetchSpy.mockResolvedValueOnce({
-    ok: true,
-    json: () => Promise.resolve(mockReview)
+import { test, expect } from '@playwright/test'
+
+test.describe('Feature Name', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/')
   })
 
-  await getCodeReviewStatus(mockRequest, mockH)
-
-  expect(mockH.response).toHaveBeenCalledWith({
-    id: mockReview._id,
-    status: mockReview.status
+  test('should complete user journey', async ({ page }) => {
+    // Test implementation
   })
 })
 ```
 
-## Markdown Processing Tests
+### GOV.UK Component Testing
+
+#### Selector Priority (Use in this order)
+
+1. **Role-based selectors** (preferred):
 
 ```javascript
-it('should format markdown in compliance reports', async () => {
-  const reviewWithReports = {
-    ...mockReview,
-    compliance_reports: [
-      {
-        id: '1',
-        report: '# Test Report\n- Item 1\n- Item 2'
-      }
-    ]
-  }
+page.getByRole('button', { name: 'Generate code review' })
+page.getByRole('textbox', { name: 'Repository URL' })
+page.getByRole('heading', { name: 'Code Review Details' })
+page.getByRole('columnheader', { name: 'Status' })
+```
 
-  fetchSpy.mockResolvedValueOnce({
-    ok: true,
-    json: () => Promise.resolve(reviewWithReports)
-  })
+2. **GOV.UK-specific selectors** with scoping:
 
-  await getCodeReviewById(mockRequest, mockH)
+```javascript
+// Scope to avoid strict mode violations
+const firstDataRow = page.getByRole('row').nth(1)
+await expect(firstDataRow.getByRole('link', { name: REPOSITORY })).toBeVisible()
 
-  expect(mockH.view).toHaveBeenCalledWith('code-reviews/detail', {
-    pageTitle: 'Code Review Details',
-    review: expect.objectContaining({
-      compliance_reports: [
-        expect.objectContaining({
-          report: expect.stringContaining('<h1>Test Report</h1>')
-        })
-      ]
-    })
-  })
+// Status tags with specific roles
+page.getByRole('status', { name: 'Review status: Started' })
+```
+
+#### Tables
+
+```javascript
+// Table headers
+await expect(
+  page.getByRole('columnheader', { name: 'Code Repository' })
+).toBeVisible()
+
+// Table rows with scoping
+const firstDataRow = page.getByRole('row').nth(1)
+await expect(firstDataRow).toBeVisible()
+```
+
+#### Status Tags
+
+```javascript
+// Status tags use role="status"
+await expect(
+  page.getByRole('status', { name: 'Review status: Started' })
+).toBeVisible()
+```
+
+#### Forms and Inputs
+
+```javascript
+// Form fields by label
+await page.getByRole('textbox', { name: 'Repository URL' }).fill(REPOSITORY)
+await page.getByRole('checkbox', { name: 'Test Standards' }).check()
+```
+
+### User Journey Testing
+
+```javascript
+test('should navigate through code review workflow', async ({ page }) => {
+  // Start at home page
+  await page.goto('/')
+
+  // Submit form
+  await page.getByRole('textbox', { name: 'Repository URL' }).fill(REPOSITORY)
+  await page.getByRole('button', { name: 'Generate code review' }).click()
+
+  // Verify navigation to details page
+  await expect(
+    page.getByRole('heading', { name: 'Code Review Details' })
+  ).toBeVisible()
+
+  // Navigate back to list
+  await page.getByRole('link', { name: 'Return to code reviews list' }).click()
+  await expect(
+    page.getByRole('heading', { name: 'Code Reviews' })
+  ).toBeVisible()
+})
+```
+
+### Accessibility Testing
+
+```javascript
+import AxeBuilder from '@axe-core/playwright'
+
+test('should meet accessibility standards', async ({ page }) => {
+  await page.goto('/code-reviews')
+
+  const results = await new AxeBuilder({ page }).analyze()
+  expect(results.violations).toEqual([])
+})
+```
+
+### Error Handling Tests
+
+```javascript
+test('should handle API errors gracefully', async ({ page }) => {
+  // Test error states, 404 pages, validation errors
+  // Verify user-friendly error messages appear
 })
 ```
 
 ## Testing Best Practices
+
+### Jest Unit Tests
 
 1. **Test user-visible behavior**, not implementation details
 2. **Mock external dependencies** (fetch, Redis, etc.)
@@ -329,16 +322,48 @@ it('should format markdown in compliance reports', async () => {
 6. **Verify error logging** happens with appropriate context
 7. **Test data transformations** (dates, status colors, markdown)
 
-## Commands to Run Tests
+### Playwright E2E Tests
+
+1. **Use constants for test data**:
+   ```javascript
+   const REPOSITORY = 'https://github.com/DEFRA/find-ffa-data-ingester'
+   ```
+2. **Test status polling behavior** - verify initial status and transitions
+3. **Verify GOV.UK styling** - check heading hierarchy, table structure
+4. **Test realistic user flows** - complete form submissions, navigation
+5. **Use role-based selectors** - preferred for GOV.UK components
+6. **Scope selectors properly** - avoid strict mode violations
+
+## Running Tests
+
+### Jest Commands
 
 ```bash
 npm test                   # Run all Jest tests with coverage
 npm run test:watch         # Run tests in watch mode
 ```
 
+### Playwright Commands
+
+```bash
+npm run test:e2e           # Run all Playwright tests
+npm run test:e2e:ui        # Run with Playwright UI
+npm run test:e2e:debug     # Debug mode
+npm run test:e2e:report    # View test report
+```
+
 ## Debugging Tips
+
+### Jest
 
 - Use `console.log` in tests to inspect mock call arguments
 - Check `mockH.view.mock.calls` to see actual template data
 - Verify `fetchSpy.mock.calls` to ensure correct API calls
 - Test both success and error scenarios for complete coverage
+
+### Playwright
+
+- Use `await page.pause()` to debug interactively
+- Check for strict mode violations by scoping selectors properly
+- Verify GOV.UK component roles match expected patterns
+- Test with real data that matches production scenarios
