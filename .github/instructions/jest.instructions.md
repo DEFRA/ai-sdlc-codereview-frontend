@@ -1,5 +1,5 @@
 ---
-applyTo: "**/*.test.js"
+applyTo: '**/*.test.js'
 ---
 
 # Jest Unit Testing Instructions
@@ -9,6 +9,7 @@ This file provides specific guidance for working with Jest unit tests (files mat
 ## Project Context
 
 This is a **Hapi.js server-side application** where Jest tests focus on:
+
 - **Controller functions** with `(request, h)` signatures
 - **API integration** mocking with `fetch`
 - **Error handling** and logging patterns
@@ -17,6 +18,7 @@ This is a **Hapi.js server-side application** where Jest tests focus on:
 ## Test Structure Patterns
 
 ### Standard Test Setup
+
 ```javascript
 import { controllerFunction } from './controller.js'
 import { config } from '~/src/config/config.js'
@@ -45,6 +47,7 @@ describe('Controller Name', () => {
 ```
 
 ### Mock Data Patterns
+
 ```javascript
 const mockReview = {
   _id: '123456789012345678901234',
@@ -58,6 +61,7 @@ const mockReview = {
 ## API Integration Testing
 
 ### Fetch Mocking Pattern
+
 ```javascript
 describe('API calls', () => {
   it('should handle successful API response', async () => {
@@ -90,6 +94,7 @@ describe('API calls', () => {
 ```
 
 ### HTTP Status Code Testing
+
 Test all specific status codes your controllers handle:
 
 ```javascript
@@ -104,7 +109,8 @@ it('should handle 404 errors', async () => {
   expect(mockH.view).toHaveBeenCalledWith('error/index', {
     pageTitle: 'Code review not found',
     heading: 'Code review not found',
-    message: 'The code review you are looking for does not exist. This may be because:',
+    message:
+      'The code review you are looking for does not exist. This may be because:',
     messageList: [
       'the URL is incorrect',
       'the code review has been deleted',
@@ -117,6 +123,7 @@ it('should handle 404 errors', async () => {
 ## Controller Testing Patterns
 
 ### View Rendering Tests
+
 ```javascript
 it('should render template with correct data', async () => {
   fetchSpy.mockResolvedValueOnce({
@@ -141,6 +148,7 @@ it('should render template with correct data', async () => {
 ```
 
 ### Error Logging Tests
+
 ```javascript
 it('should log errors with context', async () => {
   const error = new Error('Test error')
@@ -158,6 +166,7 @@ it('should log errors with context', async () => {
 ## Data Transformation Testing
 
 ### Date Formatting Tests
+
 ```javascript
 describe('formatDate', () => {
   it('should handle noon (12pm)', async () => {
@@ -195,7 +204,7 @@ describe('formatDate', () => {
     await getCodeReviewById(mockRequest, mockH)
 
     expect(mockH.view).toHaveBeenCalledWith('code-reviews/detail', {
-      pageTitle: 'Code Review Details', 
+      pageTitle: 'Code Review Details',
       review: expect.objectContaining({
         created_at: '14 January 2024 at 12:00am'
       })
@@ -205,6 +214,7 @@ describe('formatDate', () => {
 ```
 
 ### GOV.UK Table Data Formatting
+
 ```javascript
 it('should format table data correctly for govukTable macro', async () => {
   await getCodeReviews(mockRequest, mockH)
@@ -232,6 +242,7 @@ it('should format table data correctly for govukTable macro', async () => {
 ```
 
 ### Status Tag Testing
+
 ```javascript
 it('should apply correct status tag colors', async () => {
   const reviews = [
@@ -248,15 +259,16 @@ it('should apply correct status tag colors', async () => {
   await getCodeReviews(mockRequest, mockH)
 
   const tableRows = mockH.view.mock.calls[0][1].tableRows
-  expect(tableRows[0][3].html).toContain('govuk-tag--red')      // failed
-  expect(tableRows[1][3].html).toContain('govuk-tag--green')    // completed  
-  expect(tableRows[2][3].html).not.toContain('govuk-tag--')     // pending (default)
+  expect(tableRows[0][3].html).toContain('govuk-tag--red') // failed
+  expect(tableRows[1][3].html).toContain('govuk-tag--green') // completed
+  expect(tableRows[2][3].html).not.toContain('govuk-tag--') // pending (default)
 })
 ```
 
 ## API Response Testing
 
 ### JSON API Tests
+
 ```javascript
 it('should return JSON response for API endpoints', async () => {
   fetchSpy.mockResolvedValueOnce({
@@ -274,6 +286,7 @@ it('should return JSON response for API endpoints', async () => {
 ```
 
 ## Markdown Processing Tests
+
 ```javascript
 it('should format markdown in compliance reports', async () => {
   const reviewWithReports = {

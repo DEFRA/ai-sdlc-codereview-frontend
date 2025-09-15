@@ -5,6 +5,7 @@ A DEFRA digital service for AI-powered code review using Node.js + Hapi.js, GOV.
 ## Architecture Overview
 
 This is a **server-side rendered web application** with minimal client-side JavaScript:
+
 - **Backend**: Hapi.js server with plugin-based architecture
 - **Frontend**: GOV.UK Frontend components with Nunjucks templates
 - **Data Flow**: Frontend → Backend API → External Code Review API
@@ -14,6 +15,7 @@ This is a **server-side rendered web application** with minimal client-side Java
 ## Development Workflow
 
 Essential commands in this exact order:
+
 ```bash
 npm run format && npm run lint:fix && npm test  # Required before commits
 npm run dev                                      # Start development with hot reload
@@ -25,7 +27,9 @@ npm run test:e2e                                # Playwright end-to-end tests
 ## Project Structure Patterns
 
 ### Server Architecture (`src/server/`)
+
 Each feature follows this exact pattern:
+
 ```
 feature-name/
 ├── controller.js      # Route handlers with (request, h) signature
@@ -37,11 +41,13 @@ feature-name/
 **Controller Example**: See `.github/copilot-instructions/controllers.instructions.md` for detailed patterns.
 
 ### Configuration (`src/config/`)
+
 - Use `convict` for all configuration management
 - Access config via `import { config } from '~/src/config/config.js'`
 - Environment-aware defaults (production vs development)
 
 ### Client-Side (`src/client/`)
+
 - **JavaScript**: See `.github/copilot-instructions/client.instructions.md`
 - **Stylesheets**: SCSS with BEM naming, `app-` prefix for custom components
 - **Import Pattern**: Use `~` alias for absolute imports
@@ -49,21 +55,25 @@ feature-name/
 ## GOV.UK Frontend Conventions
 
 Template patterns are handled by path-specific custom instructions:
+
 - **Nunjucks templates** (`*.njk`): See `.github/copilot-instructions/templates.instructions.md`
 
 ## API Integration Patterns
 
 API integration is handled by path-specific custom instructions:
+
 - **Controller patterns**: See `.github/copilot-instructions/controllers.instructions.md`
 - **Client-side fetch**: See `.github/copilot-instructions/client.instructions.md`
 
 ## Testing
 
 Testing is handled by path-specific custom instructions:
+
 - **Jest unit tests** (`*.test.js`): See `.github/copilot-instructions/jest.instructions.md`
 - **Playwright E2E tests** (`tests/`): See `.github/copilot-instructions/tests.instructions.md`
 
 Key commands:
+
 ```bash
 npm test                   # Jest unit tests with coverage
 npm run test:e2e          # Playwright end-to-end tests
@@ -72,12 +82,14 @@ npm run test:e2e          # Playwright end-to-end tests
 ## Build System Specifics
 
 ### Webpack Configuration
+
 - **Entry**: `application.js` + `application.scss` bundled together
 - **Output**: Production adds content hashes, development uses simple names
 - **Aliases**: `/public/assets` → GOV.UK Frontend assets
 - **SCSS**: Load paths include component directories
 
 ### Babel Setup
+
 - Transpiles server code from `src/` to `.server/` directory
 - Excludes `*.test.js` and `test-helpers/` from server build
 - Use ES modules with named exports throughout
@@ -94,6 +106,7 @@ npm run test:e2e          # Playwright end-to-end tests
 ## File Creation Guidelines
 
 File creation follows path-specific patterns:
+
 - **New Features**: Follow `src/server/feature-name/` pattern
 - **Templates** (`*.njk`): See `.github/copilot-instructions/templates.instructions.md`
 - **Controllers** (`controller.js`): See `.github/copilot-instructions/controllers.instructions.md`
@@ -104,5 +117,6 @@ File creation follows path-specific patterns:
 ## Code Review Focus Areas
 
 When reviewing code, include:
+
 - Avoiding redundant code and ensuring DRY principles. IMPORTANT: Check vs existing code to avoid duplication.
 - Apply the security best practices outlined in `.github/copilot-instructions/security-review.instructions.md`.

@@ -1,5 +1,5 @@
 ---
-applyTo: "**/*.njk"
+applyTo: '**/*.njk'
 ---
 
 # Nunjucks Template Instructions
@@ -9,6 +9,7 @@ This file provides specific guidance for working with Nunjucks template files (`
 ## Project Context
 
 This is a **server-side rendered application** using:
+
 - **Nunjucks** templating engine with GOV.UK Frontend components
 - **Template inheritance** with `layouts/page.njk` as the base
 - **GOV.UK Design System** components and styling
@@ -17,6 +18,7 @@ This is a **server-side rendered application** using:
 ## Template Structure Patterns
 
 ### Standard Template Layout
+
 ```njk
 {% extends "layouts/page.njk" %}
 
@@ -37,6 +39,7 @@ This is a **server-side rendered application** using:
 ```
 
 ### Required Template Blocks
+
 - **`pageTitle`**: Always include with " - Intelligent Code Reviewer" suffix
 - **`content`**: Main content area wrapped in `govuk-width-container`
 - **`beforeContent`**: For breadcrumbs and back links (optional)
@@ -44,7 +47,9 @@ This is a **server-side rendered application** using:
 ## GOV.UK Component Usage Patterns
 
 ### Tables with Data Labels
+
 Format data specifically for the `govukTable` macro:
+
 ```njk
 {{ govukTable({
   caption: "Code Reviews",
@@ -60,8 +65,9 @@ Format data specifically for the `govukTable` macro:
 ```
 
 **Controller must format data as:**
+
 ```javascript
-const tableRows = data.map(item => [
+const tableRows = data.map((item) => [
   {
     html: `<a href="/link" class="govuk-link">${item.url}</a>`,
     attributes: { 'data-label': 'Code Repository' }
@@ -74,11 +80,12 @@ const tableRows = data.map(item => [
 ```
 
 ### Status Tags with Colors
+
 ```njk
 {{ govukTag({
   text: review.status | replace("_", " ") | title,
   classes: "govuk-tag--" + (
-    review.status | lower == "failed" and "red" or 
+    review.status | lower == "failed" and "red" or
     (review.status | lower == "completed" and "green" or "blue")
   ),
   attributes: {
@@ -90,6 +97,7 @@ const tableRows = data.map(item => [
 ```
 
 ### Summary Lists for Details Pages
+
 ```njk
 {{ govukSummaryList({
   role: "contentinfo",
@@ -110,6 +118,7 @@ const tableRows = data.map(item => [
 ```
 
 ### Tabs for Multiple Content Sections
+
 ```njk
 {% if review.compliance_reports and review.compliance_reports | length > 0 %}
   {% set tabItems = [] %}
@@ -133,19 +142,24 @@ const tableRows = data.map(item => [
 ## Data Formatting in Templates
 
 ### Date Display
+
 Use the `formatDate()` function from controllers (don't format dates in templates):
+
 ```njk
 <!-- Controller formats: "14 January 2024 at 2:00pm" -->
 <time datetime="{{ review.created_at }}">{{ review.formatted_created_at }}</time>
 ```
 
 ### Markdown Content
+
 Use the `markdown` filter for user content, always marked as safe:
+
 ```njk
 <div class="govuk-body">{{ report.content | markdown | safe }}</div>
 ```
 
 ### Status Text Formatting
+
 ```njk
 <!-- Replace underscores and title case -->
 {{ review.status | replace("_", " ") | title }}
@@ -154,6 +168,7 @@ Use the `markdown` filter for user content, always marked as safe:
 ## Accessibility Patterns
 
 ### Semantic HTML and ARIA
+
 ```njk
 <!-- Status indicators -->
 <strong class="govuk-tag" role="status" aria-label="Review status: {{ status }}">
@@ -172,6 +187,7 @@ Use the `markdown` filter for user content, always marked as safe:
 ```
 
 ### Proper Heading Hierarchy
+
 ```njk
 <!-- Always start with h1 -->
 <h1 class="govuk-heading-l">Main Page Title</h1>
@@ -186,6 +202,7 @@ Use the `markdown` filter for user content, always marked as safe:
 ## Error and Empty States
 
 ### Error Messages
+
 ```njk
 {% if error %}
   <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert">
@@ -200,6 +217,7 @@ Use the `markdown` filter for user content, always marked as safe:
 ```
 
 ### Empty States
+
 ```njk
 {% if items and items | length > 0 %}
   <!-- Display items -->
@@ -214,6 +232,7 @@ Use the `markdown` filter for user content, always marked as safe:
 ## Layout and Spacing
 
 ### Width Containers
+
 ```njk
 <!-- Main content wrapper -->
 <div class="govuk-width-container">
@@ -229,6 +248,7 @@ Use the `markdown` filter for user content, always marked as safe:
 ```
 
 ### Consistent Spacing
+
 ```njk
 <!-- Use GOV.UK spacing classes -->
 <div class="govuk-!-margin-bottom-6">Content with bottom margin</div>
@@ -238,11 +258,13 @@ Use the `markdown` filter for user content, always marked as safe:
 ## Navigation Patterns
 
 ### Back Links
+
 ```njk
 <a href="{{ backUrl }}" class="govuk-back-link">Back</a>
 ```
 
 ### Breadcrumbs (in beforeContent block)
+
 ```njk
 {% block beforeContent %}
   {{ govukBreadcrumbs({
@@ -258,6 +280,7 @@ Use the `markdown` filter for user content, always marked as safe:
 ## Forms and User Input
 
 ### Form Structure
+
 ```njk
 <form method="post" action="/submit">
   {{ govukInput({

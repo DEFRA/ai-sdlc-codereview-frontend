@@ -1,5 +1,5 @@
 ---
-applyTo: "src/client/**/*"
+applyTo: 'src/client/**/*'
 ---
 
 # Client-Side JavaScript Instructions
@@ -9,6 +9,7 @@ This file provides specific guidance for working with client-side JavaScript fil
 ## Project Context
 
 This is a **server-side rendered application** with **minimal client-side JavaScript**:
+
 - **Progressive Enhancement**: All core functionality works without JavaScript
 - **GOV.UK Frontend Integration**: Initialize and enhance GOV.UK components
 - **Status Polling**: Real-time updates for code review progress
@@ -18,12 +19,14 @@ This is a **server-side rendered application** with **minimal client-side JavaSc
 ## Architecture Principles
 
 ### Minimal JavaScript Approach
+
 - **Server-side rendering first** - pages work without JavaScript
 - **JavaScript enhances** existing functionality, doesn't replace it
 - **GOV.UK components** handle most interactive behavior
 - **Custom JavaScript** only for application-specific features
 
 ### Entry Point Pattern
+
 ```javascript
 // src/client/javascripts/application.js
 import { createAll } from 'govuk-frontend'
@@ -41,6 +44,7 @@ if (document.querySelector('[data-review-id]')) {
 ## GOV.UK Frontend Integration
 
 ### Component Initialization
+
 ```javascript
 import { createAll } from 'govuk-frontend'
 
@@ -50,10 +54,11 @@ createAll()
 // Or initialize specific components
 import { Button } from 'govuk-frontend'
 const buttons = document.querySelectorAll('[data-module="govuk-button"]')
-buttons.forEach(button => new Button(button).init())
+buttons.forEach((button) => new Button(button).init())
 ```
 
 ### Feature Detection
+
 ```javascript
 // Only initialize features if required elements exist
 if (document.querySelector('[data-review-id]')) {
@@ -68,6 +73,7 @@ if (document.querySelector('.js-enhanced-form')) {
 ## Custom JavaScript Patterns
 
 ### Module Structure
+
 ```javascript
 /**
  * @typedef {object} StatusResponse
@@ -99,6 +105,7 @@ export const __testing__ = {
 ```
 
 ### Status Polling Implementation
+
 ```javascript
 /**
  * Updates the status tag element with new status
@@ -107,7 +114,8 @@ export const __testing__ = {
  */
 function updateStatusElement(statusElement, newStatus) {
   const formattedStatus = newStatus.replace('_', ' ')
-  const titleStatus = formattedStatus.charAt(0).toUpperCase() + formattedStatus.slice(1)
+  const titleStatus =
+    formattedStatus.charAt(0).toUpperCase() + formattedStatus.slice(1)
 
   statusElement.textContent = titleStatus
   statusElement.setAttribute('aria-label', `Review status: ${titleStatus}`)
@@ -131,13 +139,16 @@ function updateStatusElement(statusElement, newStatus) {
 async function fetchReviewStatus(reviewId) {
   const response = await fetch(`/api/code-reviews/${reviewId}/status`)
   if (!response.ok) {
-    throw new Error(`Failed to fetch status for review ${reviewId}: ${response.status}`)
+    throw new Error(
+      `Failed to fetch status for review ${reviewId}: ${response.status}`
+    )
   }
   return response.json()
 }
 ```
 
 ### DOM Manipulation Patterns
+
 ```javascript
 // Use data attributes for element targeting
 const statusElements = document.querySelectorAll('[data-review-id]')
@@ -154,6 +165,7 @@ const backLinks = document.querySelectorAll('.govuk-back-link')
 ```
 
 ### Event Handling
+
 ```javascript
 function initFormEnhancements() {
   const form = document.querySelector('#code-review-form')
@@ -161,7 +173,7 @@ function initFormEnhancements() {
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault()
-    
+
     try {
       await submitForm(form)
     } catch (error) {
@@ -181,15 +193,16 @@ document.addEventListener('click', (event) => {
 ## API Integration Patterns
 
 ### Fetch with Error Handling
+
 ```javascript
 async function fetchData(url) {
   try {
     const response = await fetch(url)
-    
+
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`)
     }
-    
+
     return await response.json()
   } catch (error) {
     console.error('API request failed:', error)
@@ -199,6 +212,7 @@ async function fetchData(url) {
 ```
 
 ### POST Requests
+
 ```javascript
 async function submitData(data) {
   const response = await fetch('/api/endpoint', {
@@ -208,11 +222,11 @@ async function submitData(data) {
     },
     body: JSON.stringify(data)
   })
-  
+
   if (!response.ok) {
     throw new Error(`Submission failed: ${response.status}`)
   }
-  
+
   return response.json()
 }
 ```
@@ -220,6 +234,7 @@ async function submitData(data) {
 ## Polling and Real-Time Updates
 
 ### Intelligent Polling
+
 ```javascript
 export function initStatusPolling() {
   let pollingInterval = null
@@ -273,6 +288,7 @@ function needsPolling(status) {
 ## Testing Export Patterns
 
 ### Internal Function Exports
+
 ```javascript
 // Main feature functions
 export function initStatusPolling() {
@@ -293,10 +309,11 @@ export const __testing__ = {
 ```
 
 ### Testable Function Design
+
 ```javascript
 // Good: Pure function that can be easily tested
 function formatStatusText(status) {
-  return status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+  return status.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
 }
 
 // Good: Function with clear inputs/outputs
@@ -313,6 +330,7 @@ function isValidUrl(url) {
 ## Import Patterns
 
 ### Absolute Imports
+
 ```javascript
 // Use ~ alias for project files
 import { config } from '~/src/config/config.js'
@@ -320,6 +338,7 @@ import { helper } from '~/src/client/common/helpers/utility.js'
 ```
 
 ### External Dependencies
+
 ```javascript
 // GOV.UK Frontend
 import { createAll, Button, Details } from 'govuk-frontend'
@@ -331,6 +350,7 @@ import axios from 'axios'
 ## Error Handling and User Feedback
 
 ### User-Friendly Errors
+
 ```javascript
 function displayError(message) {
   const errorContainer = document.querySelector('.js-error-container')
@@ -348,6 +368,7 @@ function displayError(message) {
 ```
 
 ### Graceful Degradation
+
 ```javascript
 function enhanceFeature() {
   // Check for required browser features
@@ -370,6 +391,7 @@ function enhanceFeature() {
 ## Performance Considerations
 
 ### Efficient DOM Queries
+
 ```javascript
 // Cache DOM queries
 const statusElements = document.querySelectorAll('[data-review-id]')
@@ -380,6 +402,7 @@ const buttons = document.getElementsByClassName('js-button')
 ```
 
 ### Event Listener Management
+
 ```javascript
 class FeatureManager {
   constructor() {
