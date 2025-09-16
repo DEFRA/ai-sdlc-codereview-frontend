@@ -1,5 +1,7 @@
 # AI-Powered Code Review Frontend
 
+This project is a web application for submitting code repositories for AI-powered code review. This frontend service provides an interface for submitting repositories and reviewing the generated code analysis reports. It is built using Node.js with the Hapi.js framework, and employs server-side rendering with Nunjucks templates styled with GOV.UK Frontend. It calls backend REST APIs that handle the actual code logic.
+
 **Stack**: Node.js + Hapi.js, GOV.UK Frontend, Nunjucks  
 **Pattern**: Server-side rendered with minimal client-side JavaScript
 
@@ -15,14 +17,24 @@ npm run test:e2e                                # Playwright end-to-end tests
 
 ## Architecture Patterns
 
-### Feature Structure
+### Folder Structure
+
+```
+src/
+├── client/        # Client-side JavaScript (progressive enhancement only)
+├── config/        # Application configuration with convict
+├── server/        # Server-side code (Hapi.js controllers, plugins, templates)
+tests/             # Playwright end-to-end tests
+```
+
+### Feature Folder Structure
 
 ```
 src/server/feature-name/
 ├── controller.js      # Route handlers with (request, h) signature
 ├── controller.test.js # Jest unit tests
-├── index.js          # Hapi plugin with route definitions
-└── *.njk             # Nunjucks templates
+├── index.js           # Hapi plugin with route definitions
+└── *.njk              # Nunjucks templates
 ```
 
 ### Key Conventions
@@ -31,6 +43,7 @@ src/server/feature-name/
 - **Imports**: Use `~` alias for absolute paths
 - **Templates**: Include `pageTitle` in all view calls
 - **Styles**: BEM naming with `app-` prefix for custom components
+- **Testing**: Role-based selectors for Playwright, mock `fetch` for Jest
 
 ## File Creation Rules
 
@@ -57,8 +70,8 @@ src/server/feature-name/
 
 ### Tests
 
-- **Jest** (`*.test.js`): Mock `fetch`, test error scenarios, verify template data
-- **Playwright** (`tests/`): Use role-based selectors, test complete user journeys
+- **Jest** (`*.test.js`): Mock `fetch` and Redis, test error scenarios, verify template data
+- **Playwright** (`tests/`): Use role-based selectors, test complete user journeys, include accessibility checks
 
 ## Common Patterns
 
