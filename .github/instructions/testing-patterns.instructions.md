@@ -45,8 +45,8 @@ describe('Feature Name', () => {
 
 - Use constants for test data
 - Test complete user journeys
-- Verify GOV.UK component styling
-- Test status polling behavior
+- Focus on user interactions and behaviors
+- Avoid testing implementation details
 - Include accessibility checks with `AxeBuilder`
 
 ## Commands
