@@ -1,0 +1,119 @@
+{% extends "layouts/page.njk" %}
+
+{% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+
+{% block pageTitle %}{{ standardSet.name }} - Intelligent Code Reviewer{% endblock %}
+
+{% block beforeContent %}
+  {{ govukBreadcrumbs({
+    items: [
+      {
+        text: "Home",
+        href: "/"
+      },
+      {
+        text: "Standards",
+        href: "/standards"
+      },
+      {
+        text: "Standard Sets",
+        href: "/standards/standard-sets"
+      },
+      {
+        text: standardSet.name
+      }
+    ]
+  }) }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">{{ standardSet.name }}</h1>
+      
+      <p class="govuk-body">
+        <a href="{{ standardSet.repository_url }}" 
+           class="govuk-link" 
+           target="_blank" 
+           rel="noopener noreferrer">{{ standardSet.repository_url }} (opens in new tab)</a>
+      </p>
+    </div>
+  </div>
+
+  {% if standardSet.standards and standardSet.standards.length > 0 %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        {% set tableRows = [] %}
+        {% for standard in standardSet.standards %}
+          {% set classificationTags = "" %}
+          {% if standard.classificationNames and standard.classificationNames.length > 0 %}
+            {% for classification in standard.classificationNames %}
+              {% set classificationTags = classificationTags + govukTag({
+                text: classification,
+                classes: "govuk-tag--blue govuk-!-margin-right-1"
+              }) %}
+            {% endfor %}
+          {% endif %}
+          
+          {% set tableRows = (tableRows.push([
+            {
+              html: govukDetails({
+                summaryText: standard.summary,
+                html: standard.htmlContent,
+                classes: "govuk-!-margin-bottom-0"
+              }),
+              attributes: {
+                "data-label": "Standard"
+              }
+            },
+            {
+              html: classificationTags if classificationTags else "No classifications",
+              attributes: {
+                "data-label": "Classifications"
+              }
+            }
+          ]), tableRows) %}
+        {% endfor %}
+
+        {{ govukTable({
+          caption: "Standards in " + standardSet.name,
+          captionClasses: "govuk-table__caption--m govuk-!-margin-top-4",
+          attributes: {
+            "aria-label": "Standards list",
+            "data-module": "govuk-table"
+          },
+          classes: "app-standards-detail-table govuk-!-margin-bottom-6",
+          head: [
+            {
+              text: "Standard",
+              attributes: {
+                scope: "col"
+              },
+              classes: "govuk-!-width-two-thirds"
+            },
+            {
+              text: "Classifications",
+              attributes: {
+                scope: "col"
+              },
+              classes: "govuk-!-width-one-third"
+            }
+          ],
+          rows: tableRows
+        }) }}
+      </div>
+    </div>
+  {% else %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-inset-text" role="region" aria-label="No standards found">
+          <h2 class="govuk-heading-m">No standards found</h2>
+          <p class="govuk-body">This standard set does not contain any standards yet.</p>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}

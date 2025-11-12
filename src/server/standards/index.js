@@ -6,6 +6,7 @@ import {
 } from './classifications/controller.js'
 import {
   getStandardSets,
+  getStandardSetDetail,
   createStandardSet,
   deleteStandardSet
 } from './standard-sets/controller.js'
@@ -66,6 +67,16 @@ export const standards = {
           options: {
             auth: false,
             description: 'Standard sets management page',
+            tags: ['api', 'standards']
+          }
+        },
+        {
+          method: 'GET',
+          path: '/standards/standard-sets/{id}',
+          handler: getStandardSetDetail,
+          options: {
+            auth: false,
+            description: 'Standard set detail page',
             tags: ['api', 'standards']
           }
         },
