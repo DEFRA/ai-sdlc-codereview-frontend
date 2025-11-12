@@ -70,7 +70,7 @@
         {% for set in standardSets %}
           {% set tableRows = (tableRows.push([
             {
-              text: set.name,
+              html: '<a href="/standards/standard-sets/' + set._id + '" class="govuk-link">' + set.name + '</a>',
               attributes: {
                 "data-label": "Name"
               }

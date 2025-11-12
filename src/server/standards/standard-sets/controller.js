@@ -1,5 +1,6 @@
 import { config } from '~/src/config/config.js'
 import { buildNavigation } from '~/src/config/nunjucks/context/build-navigation.js'
+import { marked } from 'marked'
 
 /**
  * Get all standard sets
@@ -221,6 +222,114 @@ export async function deleteStandardSet(request, h) {
       statusCode: 500,
       title: 'Internal Server Error',
       message: 'Unable to delete standard set. Please try again later.'
+    })
+  }
+}
+
+/**
+ * Get a specific standard set with its details
+ * @param {import('@hapi/hapi').Request} request
+ * @param {import('@hapi/hapi').ResponseToolkit} h
+ */
+export async function getStandardSetDetail(request, h) {
+  const { id } = request.params
+
+  try {
+    const apiBaseUrl = config.get('apiBaseUrl')
+    const standardSetEndpoint = `${apiBaseUrl}/api/v1/standard-sets/${id}`
+    const classificationsEndpoint = `${apiBaseUrl}/api/v1/classifications`
+
+    request.logger.info(
+      `Fetching standard set details from: ${standardSetEndpoint}`
+    )
+    request.logger.info(
+      `Fetching classifications from: ${classificationsEndpoint}`
+    )
+
+    // Fetch both standard set details and classifications concurrently
+    const [standardSetResponse, classificationsResponse] = await Promise.all([
+      fetch(standardSetEndpoint),
+      fetch(classificationsEndpoint)
+    ])
+
+    if (!standardSetResponse.ok) {
+      if (standardSetResponse.status === 404) {
+        return h
+          .view('error/index', {
+            statusCode: 404,
+            title: 'Page not found',
+            message: 'The standard set you are looking for could not be found.'
+          })
+          .code(404)
+      }
+      throw new Error(
+        `Standard set API responded with status: ${standardSetResponse.status}`
+      )
+    }
+
+    if (!classificationsResponse.ok) {
+      throw new Error(
+        `Classifications API responded with status: ${classificationsResponse.status}`
+      )
+    }
+
+    const standardSet = await standardSetResponse.json()
+    const classifications = await classificationsResponse.json()
+
+    // Create a lookup map for classifications
+    const classificationMap = new Map()
+    classifications.forEach((classification) => {
+      classificationMap.set(classification._id, classification.name)
+    })
+
+    // Process standards to include classification names and extract markdown summaries
+    const processedStandards = standardSet.standards.map((standard) => {
+      // Get classification names for this standard
+      const classificationNames = standard.classification_ids
+        .map((id) => classificationMap.get(id))
+        .filter((name) => name) // Remove any undefined classifications
+
+      // Parse markdown to extract heading for summary
+      const tokens = marked.lexer(standard.text)
+      const firstHeading = tokens.find((token) => token.type === 'heading')
+      const summary = firstHeading ? firstHeading.text : 'Standard Details'
+
+      // Convert full markdown to HTML
+      const htmlContent = marked(standard.text)
+
+      return {
+        ...standard,
+        classificationNames,
+        summary,
+        htmlContent
+      }
+    })
+
+    return h.view('standards/standard-sets/detail', {
+      pageTitle: standardSet.name,
+      standardSet: {
+        ...standardSet,
+        standards: processedStandards
+      },
+      navigation: buildNavigation(request)
+    })
+  } catch (err) {
+    const apiBaseUrl = config.get('apiBaseUrl')
+    request.logger.error({
+      msg: 'Error fetching standard set details',
+      error: err.message,
+      stack: err.stack,
+      apiBaseUrl,
+      standardSetId: id,
+      endpoints: {
+        standardSet: `/api/v1/standard-sets/${id}`,
+        classifications: '/api/v1/classifications'
+      }
+    })
+    return h.view('error/index', {
+      statusCode: 500,
+      title: 'Internal Server Error',
+      message: 'Unable to fetch standard set details. Please try again later.'
     })
   }
 }
